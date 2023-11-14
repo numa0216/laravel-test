@@ -1,14 +1,6 @@
 
 FROM php:8.2-fpm
 
-ARG USERNAME=naganuma
-ARG GROUPNAME=naganuma
-ARG UID=1000
-ARG GID=1000
-RUN groupadd --force -g $GID $GROUPNAME && \
-    useradd -m -s /bin/bash -u $UID -g $GID $USERNAME
-USER $USERNAME
-
 EXPOSE 5173
 RUN apt-get update \
     && apt-get install -y \
@@ -43,3 +35,16 @@ WORKDIR /src
 ADD . /src/storage
 RUN chown -R www-data:www-data /src/storage
 ENTRYPOINT [ "bash", "-c", "composer install; npm install; exec php-fpm" ]
+
+WORKDIR /src
+ADD . /src/vendor
+RUN chown -R www-data:www-data /src/vendor
+
+ARG USERNAME=naganuma
+ARG GROUPNAME=naganuma
+ARG UID=1000
+ARG GID=1000
+RUN groupadd --force -g $GID $GROUPNAME && \
+    useradd -m -s /bin/bash -u $UID -g $GID $USERNAME
+
+USER $USERNAME
